@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Working With Websockets</title>
+</head>
+
+<body>
+    <div id="app">
+        Working With Web Sockets
+        <br>
+        {{ testMessage }}
+        <button v-if="!isConnected" v-on:click="openWSConnection()"> Conncet To Chat</button>
+        <button v-if="isConnected" v-on:click="disconnectFromWS()"> Disconnect From Chat</button>
+        <h3>Client Status : {{ isConnected }} </h3> <br>
+        <form v-on:submit.prevent v-if="isConnected">
+            <input v-model="messageToSend" placeholder="Enter Message">
+            <button v-on:click="sendMessage()"> Send Message</button>
+        </form>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+    <script>
+
+        var app = new Vue({
+            el: '#app',
+            data: {
+                testMessage: "Hello VueJS!",
+                isConnected: false,
+                messageToSend: "",
+                chatLog : []
+            },
+            methods: {
+                openWSConnection: function () {
+
+                    this.ws = new WebSocket('ws://localhost:8080')
+                    if (this.ws.OPEN) {
+                        this.isConnected = true
+                    }
+                    this.ws.onmessage = function(response){
+                        this.chatLog.push(response.data)
+                        console.log(response.data)
+                    }
+                },
+                disconnectFromWS: function () {
+                    this.ws.close()
+                    console.log("Connection Should Close")
+                },
+                sendMessage: function () {
+                    this.ws.send(this.messageToSend)
+                }
+            }
+        });
+
+
+        // var ws = new WebSocket('ws://localhost:8080')
+        // ws.onopen = ()=>{
+        //     console.log("on open")
+        //     ws.send("Hand shake complete..")
+        // }
+        // ws.onconnection = ()=>{
+        //     console.log("on connection")
+        // }
+        // ws.onclose = ()=>{
+        //     console.log("Connection closed")
+        // }
+        // ws.onmessage = (response) =>{
+        //     let message = response.data
+        //     console.log(message)
+        // }
+    </script>
+</body>
+
+</html>
