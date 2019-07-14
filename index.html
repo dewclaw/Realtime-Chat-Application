@@ -20,6 +20,11 @@
             <input v-model="messageToSend" placeholder="Enter Message">
             <button v-on:click="sendMessage()"> Send Message</button>
         </form>
+        <ul id="messageHistory">
+            <li v-for="message in chatLog">
+                {{ message }}
+            </li>
+        </ul>
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
@@ -35,14 +40,15 @@
             },
             methods: {
                 openWSConnection: function () {
-
+                    let messageReceived = ""
                     this.ws = new WebSocket('ws://localhost:8080')
                     if (this.ws.OPEN) {
                         this.isConnected = true
                     }
                     this.ws.onmessage = function(response){
-                        this.chatLog.push(response.data)
+                        // this.chatLog.push(response.data)
                         console.log(response.data)
+                        app.chatLog.push(response.data)
                     }
                 },
                 disconnectFromWS: function () {
@@ -50,7 +56,10 @@
                     console.log("Connection Should Close")
                 },
                 sendMessage: function () {
+                    // this.chatLog.push(messageToSend)
                     this.ws.send(this.messageToSend)
+                    // this.chatLog.push(this.messageToSend)
+                    this.messageToSend = ""
                 }
             }
         });
